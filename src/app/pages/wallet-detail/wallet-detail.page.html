@@ -1,0 +1,74 @@
+<ion-header no-border>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button color="white"></ion-back-button>
+        </ion-buttons>
+        <ion-title>{{ wallet.name }}</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <!-- <div class="my-content"> -->
+    <div class="header">
+        <div class="info">
+            <div class="amount">{{ amount | coinDisplay }}</div>
+            <div class="money">≈ {{ amountInOtherDisplay }}</div>
+        </div>
+    </div>
+
+    <div class="btns">
+        <div class="money transfer" tappable (click)="goTransferPage()">
+            <div class="icon"></div>
+            <p class="text" translate>SEND</p>
+        </div>
+        <div class="money receive" (click)="goReceivePage()">
+            <div class="icon"></div>
+            <p class="text" translate>RECEIVE</p>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab" [ngClass]="type == 0 ? 'focus' : ''" (click)="toggleType(0)">
+            <div class="label" translate>ALL</div>
+        </div>
+        <div class="tab" [ngClass]="type == 1 ? 'focus' : ''" (click)="toggleType(1)">
+            <div class="label" translate>SEND</div>
+        </div>
+        <div class="tab" [ngClass]="type == 2 ? 'focus' : ''" (click)="toggleType(2)">
+            <div class="label" translate>RECEIVE</div>
+        </div>
+        <div class="tab" [ngClass]="type == 5 ? 'focus' : ''" (click)="toggleType(5)">
+            <div class="label" translate>OTHERS</div>
+        </div>
+    </div>
+
+    <div class="transactions">
+        <div class="transaction" *ngFor="let transaction of allTransactionList" tappable
+            (click)="goResultPage(transaction)">
+            <div class="info">
+                <div class="receiver" *ngIf="transaction.tx_type != 3 && transaction.tx_type != 4">
+                    {{ (transaction.tx_type != 2 ? transaction.to : transaction.from) | addPocEllipsis }}</div>
+
+                <div class="receiver" *ngIf="transaction.tx_type == 3 || transaction.tx_type == 4">
+                    {{ transaction.to }}</div>
+
+                <div class="date">{{ transaction.timestamp | timeDisplay }}</div>
+            </div>
+            <div class="detail">
+                <div class="amount"
+                    [ngClass]="(transaction.tx_type == 1 || transaction.tx_type == 3 )? 'send' : 'receive'">
+                    {{ (transaction.tx_type == 1 || transaction.tx_type == 3 )? '-' : '+' }}{{ transaction.displayValue | coinDisplay }}
+                    Poc</div>
+                <div class="status">{{ transaction.blockHeight }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="no-more" *ngIf="!loading" translate>NOMORE</div>
+    <!-- </div> -->
+
+
+    <ion-infinite-scroll (ionInfinite)="getMore($event)">
+        <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+</ion-content>
